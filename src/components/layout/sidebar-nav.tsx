@@ -23,7 +23,7 @@ export function SidebarNav() {
   const pathname = usePathname();
 
   return (
-    <Sidebar className="border-r" collapsible="icon">
+    <Sidebar className="border-r no-print" collapsible="icon">
       <SidebarHeader>
         <div className="flex items-center gap-2 p-2">
           <LogoIcon className="size-8 text-sidebar-primary" />

@@ -14,7 +14,7 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion';
 import ChatMessage from './chat-message';
-import { Loader2, Sparkles } from 'lucide-react';
+import { Loader2, Sparkles, Printer } from 'lucide-react';
 import { format } from 'date-fns';
 import { Badge } from '../ui/badge';
 
@@ -36,6 +36,10 @@ export default function FeedbackReportClient({ interviewId }: { interviewId: str
     } finally {
       setIsGenerating(false);
     }
+  };
+
+  const handlePrint = () => {
+    window.print();
   };
 
   if (!interview) {
@@ -64,7 +68,7 @@ export default function FeedbackReportClient({ interviewId }: { interviewId: str
 
   return (
     <div className="space-y-8">
-      <div className="flex items-start justify-between">
+      <div className="flex items-start justify-between no-print">
         <div>
             <h1 className="text-3xl font-bold tracking-tight">Interview Report</h1>
             <p className="text-muted-foreground capitalize">
@@ -72,18 +76,24 @@ export default function FeedbackReportClient({ interviewId }: { interviewId: str
             {format(new Date(interview.createdAt), 'MMMM d, yyyy')}
             </p>
         </div>
-        <Badge variant="outline" className="text-lg capitalize">
-            {interview.settings.difficulty}
-        </Badge>
+        <div className='flex items-center gap-2'>
+            <Badge variant="outline" className="text-lg capitalize">
+                {interview.settings.difficulty}
+            </Badge>
+            <Button variant="outline" size="icon" onClick={handlePrint}>
+                <Printer className="h-5 w-5" />
+                <span className="sr-only">Print or save as PDF</span>
+            </Button>
+        </div>
       </div>
 
-      <Card>
+      <Card className="printable-content">
         <CardHeader>
           <CardTitle>Performance Analysis</CardTitle>
         </CardHeader>
         <CardContent>
           {!interview.report ? (
-            <div className="flex flex-col items-center justify-center gap-4 rounded-lg border-2 border-dashed p-8 text-center">
+            <div className="flex flex-col items-center justify-center gap-4 rounded-lg border-2 border-dashed p-8 text-center no-print">
               <h3 className="text-xl font-semibold">Generate your report</h3>
               <p className="text-muted-foreground">
                 Get detailed, AI-powered feedback on your performance.
@@ -130,7 +140,7 @@ export default function FeedbackReportClient({ interviewId }: { interviewId: str
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="printable-content">
         <CardHeader>
           <CardTitle>Full Transcript</CardTitle>
         </CardHeader>
