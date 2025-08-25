@@ -16,10 +16,9 @@ const AIInterviewerInputSchema = z.object({
     .string()
     .describe('The user response to the current interview question.'),
   currentQuestion: z.string().describe('The current interview question.'),
-  interviewType: z
+  topic: z
     .string()
-    .describe('The type of interview (e.g., behavioral, technical).'),
-  difficultyLevel: z.string().describe('The difficulty level of the interview.'),
+    .describe('The topic of the interview (e.g., "React Hooks", "Javascript Promises").'),
 });
 export type AIInterviewerInput = z.infer<typeof AIInterviewerInputSchema>;
 
@@ -37,7 +36,7 @@ const prompt = ai.definePrompt({
   name: 'aiInterviewerPrompt',
   input: {schema: AIInterviewerInputSchema},
   output: {schema: AIInterviewerOutputSchema},
-  prompt: `You are an AI interviewer designed to conduct realistic and challenging mock interviews. The interview type is {{{interviewType}}} and the difficulty level is {{{difficultyLevel}}}.\n\nCurrent Question: {{{currentQuestion}}}\nUser Response: {{{userResponse}}}\n\nBased on the user's response, generate a relevant follow-up question. Also, provide feedback on the user's answer, commenting on clarity, relevance, and overall structure. The goal is to provide constructive criticism to improve the user's interview skills.  If the user has not provided a response yet, generate the first question.\n\nFollow-up Question: 
+  prompt: `You are an AI interviewer designed to conduct realistic and challenging mock interviews. The interview topic is {{{topic}}}.\n\nCurrent Question: {{{currentQuestion}}}\nUser Response: {{{userResponse}}}\n\nBased on the user's response, generate a relevant follow-up question. Also, provide feedback on the user's answer, commenting on clarity, relevance, and overall structure. The goal is to provide constructive criticism to improve the user's interview skills.  If the user has not provided a response yet, generate the first question.\n\nFollow-up Question: 
 Feedback: `,
 });
 

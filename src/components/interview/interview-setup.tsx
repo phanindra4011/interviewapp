@@ -2,17 +2,11 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Button } from '@/components/ui/button';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { useInterviewStore } from '@/hooks/use-interview-store';
 import { getInitialQuestion } from '@/lib/actions';
@@ -20,14 +14,10 @@ import { Loader2 } from 'lucide-react';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 
 const setupSchema = z.object({
-  type: z.string().min(1, 'Please select an interview type.'),
-  difficulty: z.string().min(1, 'Please select a difficulty level.'),
+  topic: z.string().min(2, 'Please enter a topic with at least 2 characters.'),
 });
 
 type SetupFormValues = z.infer<typeof setupSchema>;
-
-const interviewTypes = ['Behavioral', 'Technical', 'System Design', 'Product Sense'];
-const difficultyLevels = ['Entry-Level', 'Mid-Level', 'Senior', 'Staff'];
 
 export default function InterviewSetup() {
   const router = useRouter();
@@ -38,15 +28,14 @@ export default function InterviewSetup() {
   const form = useForm<SetupFormValues>({
     resolver: zodResolver(setupSchema),
     defaultValues: {
-      type: '',
-      difficulty: '',
+      topic: '',
     },
   });
 
   const onSubmit = async (data: SetupFormValues) => {
     setIsLoading(true);
     try {
-      const initialResponse = await getInitialQuestion(data.type, data.difficulty);
+      const initialResponse = await getInitialQuestion(data.topic);
       
       const newInterviewId = `interview_${Date.now()}`;
       
@@ -82,48 +71,13 @@ export default function InterviewSetup() {
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <FormField
           control={form.control}
-          name="type"
+          name="topic"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Interview Type</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a type..." />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {interviewTypes.map((type) => (
-                    <SelectItem key={type} value={type}>
-                      {type}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="difficulty"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Difficulty Level</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a difficulty..." />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {difficultyLevels.map((level) => (
-                    <SelectItem key={level} value={level}>
-                      {level}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <FormLabel>Interview Topic</FormLabel>
+              <FormControl>
+                <Input placeholder="e.g., React Hooks, Behavioral, System Design" {...field} />
+              </FormControl>
               <FormMessage />
             </FormItem>
           )}

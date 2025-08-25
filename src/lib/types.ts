@@ -8,8 +8,7 @@ export type InterviewMessage = {
 };
 
 export type InterviewSettings = {
-  type: string;
-  difficulty: string;
+  topic: string;
 };
 
 export type InterviewReport = {

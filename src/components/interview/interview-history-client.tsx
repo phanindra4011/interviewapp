@@ -49,8 +49,7 @@ export default function InterviewHistoryClient() {
           <TableHeader>
             <TableRow>
               <TableHead>Date</TableHead>
-              <TableHead>Type</TableHead>
-              <TableHead>Difficulty</TableHead>
+              <TableHead>Topic</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -60,8 +59,7 @@ export default function InterviewHistoryClient() {
                 <TableCell className="font-medium">
                   {format(new Date(interview.createdAt), 'MMM d, yyyy')}
                 </TableCell>
-                <TableCell>{interview.settings.type}</TableCell>
-                <TableCell>{interview.settings.difficulty}</TableCell>
+                <TableCell className="capitalize">{interview.settings.topic}</TableCell>
                 <TableCell className="text-right">
                   <Button
                     variant="outline"

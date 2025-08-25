@@ -65,8 +65,8 @@ export default function FeedbackReportClient({ interviewId }: { interviewId: str
     <div className="space-y-8">
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Interview Report</h1>
-        <p className="text-muted-foreground">
-          {interview.settings.type} ({interview.settings.difficulty}) -{' '}
+        <p className="text-muted-foreground capitalize">
+          {interview.settings.topic} -{' '}
           {format(new Date(interview.createdAt), 'MMMM d, yyyy')}
         </p>
       </div>

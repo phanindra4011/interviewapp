@@ -68,8 +68,7 @@ export default function ChatInterface({ interviewId }: { interviewId: string }) 
       }
 
       const response = await getNextQuestion(
-        interview.settings.type,
-        interview.settings.difficulty,
+        interview.settings.topic,
         lastAssistantMessage.content,
         userMessage.content
       );
@@ -106,8 +105,8 @@ export default function ChatInterface({ interviewId }: { interviewId: string }) 
   return (
     <div className="flex h-full flex-col rounded-lg border bg-card text-card-foreground shadow-sm">
       <div className="flex items-center justify-between border-b p-4">
-        <h2 className="text-xl font-semibold">
-          {interview.settings.type} Interview
+        <h2 className="text-xl font-semibold capitalize">
+          {interview.settings.topic} Interview
         </h2>
         <Button onClick={handleFinishInterview} disabled={interview.isFinished} variant="destructive">
           End Interview

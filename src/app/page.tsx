@@ -11,7 +11,7 @@ export default function Home() {
           </h1>
           <p className="mt-4 text-lg text-muted-foreground">
             Your personal AI-powered coach to help you ace your next interview.
-            Configure your mock interview below to get started.
+            Enter an interview topic below to get started.
           </p>
         </div>
         <Card className="mx-auto w-full max-w-lg shadow-lg">
