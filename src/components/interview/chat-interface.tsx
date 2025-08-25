@@ -68,12 +68,12 @@ export default function ChatInterface({ interviewId }: { interviewId: string }) 
         throw new Error("Could not find the last question from the assistant.");
       }
 
-      const response = await getNextQuestion(
-        interview.settings.topic,
-        interview.settings.difficulty,
-        lastAssistantMessage.content,
-        userMessage.content
-      );
+      const response = await getNextQuestion({
+        topic: interview.settings.topic,
+        difficulty: interview.settings.difficulty,
+        currentQuestion: lastAssistantMessage.content,
+        userResponse: userMessage.content
+      });
 
       const assistantMessage = {
         id: `msg_${Date.now() + 1}`,

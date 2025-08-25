@@ -1,6 +1,6 @@
 'use server';
 
-import { aiInterviewer, AIInterviewerOutput } from '@/ai/flows/ai-interviewer';
+import { aiInterviewer, AIInterviewerInput, AIInterviewerOutput } from '@/ai/flows/ai-interviewer';
 import { generateFeedback, PerformanceFeedbackOutput } from '@/ai/flows/performance-feedback';
 import type { InterviewMessage, InterviewReport } from './types';
 
@@ -14,17 +14,9 @@ export async function getInitialQuestion(topic: string, difficulty: string): Pro
 }
 
 export async function getNextQuestion(
-  topic: string,
-  difficulty: string,
-  currentQuestion: string,
-  userResponse: string
+  input: AIInterviewerInput
 ): Promise<AIInterviewerOutput> {
-  return await aiInterviewer({
-    topic,
-    difficulty,
-    currentQuestion,
-    userResponse,
-  });
+  return await aiInterviewer(input);
 }
 
 export async function generateReport(messages: InterviewMessage[]): Promise<InterviewReport> {
