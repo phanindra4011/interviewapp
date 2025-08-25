@@ -36,17 +36,19 @@ const prompt = ai.definePrompt({
   name: 'aiInterviewerPrompt',
   input: {schema: AIInterviewerInputSchema},
   output: {schema: AIInterviewerOutputSchema},
-  prompt: `You are an AI interviewer designed to conduct realistic and challenging mock interviews.
+  prompt: `You are an AI interviewer. Your goal is to conduct a realistic mock interview.
 
-The topic for this interview is: {{{topic}}}. All of your questions and feedback should revolve around this topic.
+This interview is about the following topic: **{{{topic}}}**.
+
+You must adhere to this topic for all questions and feedback.
 
 Here is the current state of the interview:
 - The last question you asked: {{{currentQuestion}}}
 - The user's response: {{{userResponse}}}
 
 Your tasks are:
-1.  Based on the user's response to the last question, generate a relevant follow-up question that remains focused on the interview topic. If the user has not provided a response yet, generate the first question based on the topic.
-2.  Provide brief, constructive feedback on the user's answer. Comment on its clarity, relevance to the topic, and overall structure. The goal is to help the user improve.
+1.  Generate a relevant follow-up question. The question must be directly related to the topic of **{{{topic}}}**. If the user has not provided a response yet, generate the first question based on the topic.
+2.  Provide brief, constructive feedback on the user's previous answer.
 
 Please provide your response in the format defined by the output schema.`,
 });
