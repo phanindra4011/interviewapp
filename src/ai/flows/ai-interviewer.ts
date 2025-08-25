@@ -19,6 +19,9 @@ const AIInterviewerInputSchema = z.object({
   topic: z
     .string()
     .describe('The topic of the interview (e.g., "React Hooks", "Javascript Promises").'),
+  difficulty: z
+    .string()
+    .describe('The difficulty of the interview (e.g., "Beginner", "Medium", "Pro").'),
 });
 export type AIInterviewerInput = z.infer<typeof AIInterviewerInputSchema>;
 
@@ -39,15 +42,16 @@ const prompt = ai.definePrompt({
   prompt: `You are an AI interviewer. Your goal is to conduct a realistic mock interview.
 
 This interview is about the following topic: **{{{topic}}}**.
+The difficulty level for this interview is: **{{{difficulty}}}**.
 
-You must adhere to this topic for all questions and feedback.
+You must adhere to this topic and difficulty for all questions and feedback.
 
 Here is the current state of the interview:
 - The last question you asked: {{{currentQuestion}}}
 - The user's response: {{{userResponse}}}
 
 Your tasks are:
-1.  Generate a relevant follow-up question. The question must be directly related to the topic of **{{{topic}}}**. If the user has not provided a response yet, generate the first question based on the topic.
+1.  Generate a relevant follow-up question. The question must be directly related to the topic of **{{{topic}}}** and at the **{{{difficulty}}}** level. If the user has not provided a response yet, generate the first question based on the topic and difficulty.
 2.  Provide brief, constructive feedback on the user's previous answer.
 
 Please provide your response in the format defined by the output schema.`,

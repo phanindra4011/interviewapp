@@ -12,9 +12,17 @@ import { useInterviewStore } from '@/hooks/use-interview-store';
 import { getInitialQuestion } from '@/lib/actions';
 import { Loader2 } from 'lucide-react';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 
 const setupSchema = z.object({
   topic: z.string().min(2, 'Please enter a topic with at least 2 characters.'),
+  difficulty: z.enum(['Beginner', 'Medium', 'Pro']),
 });
 
 type SetupFormValues = z.infer<typeof setupSchema>;
@@ -29,13 +37,14 @@ export default function InterviewSetup() {
     resolver: zodResolver(setupSchema),
     defaultValues: {
       topic: '',
+      difficulty: 'Medium',
     },
   });
 
   const onSubmit = async (data: SetupFormValues) => {
     setIsLoading(true);
     try {
-      const initialResponse = await getInitialQuestion(data.topic);
+      const initialResponse = await getInitialQuestion(data.topic, data.difficulty);
       
       const newInterviewId = `interview_${Date.now()}`;
       
@@ -78,6 +87,28 @@ export default function InterviewSetup() {
               <FormControl>
                 <Input placeholder="e.g., React Hooks, Behavioral, System Design" {...field} />
               </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="difficulty"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Difficulty Level</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a difficulty" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="Beginner">Beginner</SelectItem>
+                  <SelectItem value="Medium">Medium</SelectItem>
+                  <SelectItem value="Pro">Pro</SelectItem>
+                </SelectContent>
+              </Select>
               <FormMessage />
             </FormItem>
           )}

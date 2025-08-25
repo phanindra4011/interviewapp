@@ -11,6 +11,7 @@ import { Loader2, Send } from 'lucide-react';
 import ChatMessage from './chat-message';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
+import { Badge } from '../ui/badge';
 
 export default function ChatInterface({ interviewId }: { interviewId: string }) {
   const router = useRouter();
@@ -69,6 +70,7 @@ export default function ChatInterface({ interviewId }: { interviewId: string }) 
 
       const response = await getNextQuestion(
         interview.settings.topic,
+        interview.settings.difficulty,
         lastAssistantMessage.content,
         userMessage.content
       );
@@ -105,9 +107,12 @@ export default function ChatInterface({ interviewId }: { interviewId: string }) 
   return (
     <div className="flex h-full flex-col rounded-lg border bg-card text-card-foreground shadow-sm">
       <div className="flex items-center justify-between border-b p-4">
-        <h2 className="text-xl font-semibold capitalize">
-          {interview.settings.topic} Interview
-        </h2>
+        <div className='flex items-center gap-4'>
+            <h2 className="text-xl font-semibold capitalize">
+            {interview.settings.topic} Interview
+            </h2>
+            <Badge variant="outline" className='capitalize'>{interview.settings.difficulty}</Badge>
+        </div>
         <Button onClick={handleFinishInterview} disabled={interview.isFinished} variant="destructive">
           End Interview
         </Button>

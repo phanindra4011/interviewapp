@@ -9,6 +9,7 @@ export type InterviewMessage = {
 
 export type InterviewSettings = {
   topic: string;
+  difficulty: "Beginner" | "Medium" | "Pro";
 };
 
 export type InterviewReport = {

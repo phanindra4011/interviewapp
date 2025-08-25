@@ -4,9 +4,10 @@ import { aiInterviewer, AIInterviewerOutput } from '@/ai/flows/ai-interviewer';
 import { generateFeedback, PerformanceFeedbackOutput } from '@/ai/flows/performance-feedback';
 import type { InterviewMessage, InterviewReport } from './types';
 
-export async function getInitialQuestion(topic: string): Promise<AIInterviewerOutput> {
+export async function getInitialQuestion(topic: string, difficulty: string): Promise<AIInterviewerOutput> {
   return await aiInterviewer({
     topic,
+    difficulty,
     currentQuestion: 'The user is ready to begin.',
     userResponse: 'Let\'s start.',
   });
@@ -14,11 +15,13 @@ export async function getInitialQuestion(topic: string): Promise<AIInterviewerOu
 
 export async function getNextQuestion(
   topic: string,
+  difficulty: string,
   currentQuestion: string,
   userResponse: string
 ): Promise<AIInterviewerOutput> {
   return await aiInterviewer({
     topic,
+    difficulty,
     currentQuestion,
     userResponse,
   });

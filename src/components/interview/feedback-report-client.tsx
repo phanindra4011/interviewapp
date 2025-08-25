@@ -16,6 +16,7 @@ import {
 import ChatMessage from './chat-message';
 import { Loader2, Sparkles } from 'lucide-react';
 import { format } from 'date-fns';
+import { Badge } from '../ui/badge';
 
 export default function FeedbackReportClient({ interviewId }: { interviewId: string }) {
   const router = useRouter();
@@ -63,12 +64,17 @@ export default function FeedbackReportClient({ interviewId }: { interviewId: str
 
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Interview Report</h1>
-        <p className="text-muted-foreground capitalize">
-          {interview.settings.topic} -{' '}
-          {format(new Date(interview.createdAt), 'MMMM d, yyyy')}
-        </p>
+      <div className="flex items-start justify-between">
+        <div>
+            <h1 className="text-3xl font-bold tracking-tight">Interview Report</h1>
+            <p className="text-muted-foreground capitalize">
+            {interview.settings.topic} -{' '}
+            {format(new Date(interview.createdAt), 'MMMM d, yyyy')}
+            </p>
+        </div>
+        <Badge variant="outline" className="text-lg capitalize">
+            {interview.settings.difficulty}
+        </Badge>
       </div>
 
       <Card>
