@@ -8,56 +8,27 @@
  * - PerformanceFeedbackOutput - The return type for the generateFeedback function.
  */
 
-import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
+import {gemini} from '@/ai/gemini';
 
-const PerformanceFeedbackInputSchema = z.object({
-  question: z.string().describe('The interview question asked.'),
-  answer: z.string().describe('The user\'s answer to the interview question.'),
-});
-export type PerformanceFeedbackInput = z.infer<typeof PerformanceFeedbackInputSchema>;
+export type PerformanceFeedbackInput = {
+  question: string;
+  answer: string;
+};
 
-const PerformanceFeedbackOutputSchema = z.object({
-  clarity: z.string().describe('Analysis of the answer\'s clarity.'),
-  relevance: z.string().describe('Analysis of the answer\'s relevance to the question.'),
-  structure: z.string().describe('Analysis of the answer\'s overall structure and organization.'),
-  overallFeedback: z.string().describe('Overall feedback and suggestions for improvement.'),
-});
-export type PerformanceFeedbackOutput = z.infer<typeof PerformanceFeedbackOutputSchema>;
+export type PerformanceFeedbackOutput = {
+  feedback: string;
+};
 
 export async function generateFeedback(input: PerformanceFeedbackInput): Promise<PerformanceFeedbackOutput> {
-  return performanceFeedbackFlow(input);
+  const prompt = `You are an expert technical interviewer. Given the following question and answer, provide brief, constructive feedback to help the candidate improve.\n\nQuestion: ${input.question}\nAnswer: ${input.answer}\n\nFeedback:`;
+  const model = gemini.getGenerativeModel({ model: "gemini-1.5-flash" });
+  const result = await model.generateContent(prompt);
+  const text = result.response.text();
+  try {
+    const json = JSON.parse(text);
+    return { feedback: json.feedback };
+  } catch {
+    return { feedback: text };
+  }
 }
 
-const prompt = ai.definePrompt({
-  name: 'performanceFeedbackPrompt',
-  input: {schema: PerformanceFeedbackInputSchema},
-  output: {schema: PerformanceFeedbackOutputSchema},
-  prompt: `You are an expert interview coach providing feedback on interview answers.
-
-  Analyze the following answer to the question, providing detailed feedback on clarity, relevance, and structure. Provide a concise overall feedback with suggestions for improvement.
-
-  Question: {{{question}}}
-  Answer: {{{answer}}}
-
-  Focus on actionable insights that the candidate can use to improve their interviewing skills.
-
-  Your analysis should be structured as follows:
-
-  Clarity: [Your analysis of the answer's clarity]
-  Relevance: [Your analysis of the answer's relevance to the question]
-  Structure: [Your analysis of the answer's structure and organization]
-  Overall Feedback: [Overall feedback and suggestions for improvement]`,
-});
-
-const performanceFeedbackFlow = ai.defineFlow(
-  {
-    name: 'performanceFeedbackFlow',
-    inputSchema: PerformanceFeedbackInputSchema,
-    outputSchema: PerformanceFeedbackOutputSchema,
-  },
-  async input => {
-    const {output} = await prompt(input);
-    return output!;
-  }
-);
