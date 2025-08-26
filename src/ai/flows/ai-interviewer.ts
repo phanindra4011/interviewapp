@@ -22,6 +22,12 @@ const AIInterviewerInputSchema = z.object({
   difficulty: z
     .string()
     .describe('The difficulty of the interview (e.g., "Beginner", "Medium", "Pro").'),
+  history: z
+    .array(z.object({
+      question: z.string(),
+      answer: z.string(),
+    }))
+    .describe('All previous Q&A pairs in the interview, in order.'),
 });
 export type AIInterviewerInput = z.infer<typeof AIInterviewerInputSchema>;
 
@@ -46,15 +52,20 @@ The difficulty level for this interview is: **{{{difficulty}}}**.
 
 You must adhere to this topic and difficulty for all questions and feedback.
 
-Here is the current state of the interview:
-- The last question you asked: {{{currentQuestion}}}
-- The user's response: {{{userResponse}}}
+Here is the full history of the interview so far (do not repeat any of these questions):
+{{#each history}}
+- Q: {{question}}
+  A: {{answer}}
+{{/each}}
+
+The last question you asked: {{{currentQuestion}}}
+The user's response: {{{userResponse}}}
 
 Your tasks are:
-1.  Generate a relevant follow-up question. The question must be directly related to the topic of **{{{topic}}}** and at the **{{{difficulty}}}** level. If the user has not provided a response yet, generate the first question based on the topic and difficulty.
-2.  Provide brief, constructive feedback on the user's previous answer.
+1. Generate a relevant follow-up question that has NOT been asked before in this interview. The question must be directly related to the topic of **{{{topic}}}** and at the **{{{difficulty}}}** level. If the user has not provided a response yet, generate the first question based on the topic and difficulty.
+2. Provide brief, constructive feedback on the user's previous answer.
 
-Please provide your response in the format defined by the output schema.`,
+Do NOT repeat any previous questions. Please provide your response in the format defined by the output schema.`,
 });
 
 const aiInterviewerFlow = ai.defineFlow(

@@ -113,7 +113,7 @@ export default function InterviewSetup() {
             </FormItem>
           )}
         />
-        <Button type="submit" className="w-full" disabled={isLoading}>
+  <Button type="submit" className="w-full font-semibold text-lg py-3 rounded-full" disabled={isLoading}>
           {isLoading ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />

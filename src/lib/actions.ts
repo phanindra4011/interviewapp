@@ -10,11 +10,12 @@ export async function getInitialQuestion(topic: string, difficulty: string): Pro
     difficulty,
     currentQuestion: 'The user is ready to begin.',
     userResponse: 'Let\'s start.',
+    history: [],
   });
 }
 
 export async function getNextQuestion(
-  input: AIInterviewerInput
+  input: Omit<AIInterviewerInput, 'history'> & { history: { question: string; answer: string }[] }
 ): Promise<AIInterviewerOutput> {
   return await aiInterviewer(input);
 }

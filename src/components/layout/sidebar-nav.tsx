@@ -23,7 +23,7 @@ export function SidebarNav() {
   const pathname = usePathname();
 
   return (
-    <Sidebar className="border-r no-print" collapsible="icon">
+    <Sidebar className="border-r no-print bg-gradient-to-b from-[#f0f4ff] to-[#e0e0f8]" collapsible="icon">
       <SidebarHeader>
         <div className="flex items-center gap-2 p-2">
           <LogoIcon className="size-8 text-sidebar-primary" />
@@ -40,10 +40,15 @@ export function SidebarNav() {
                 asChild
                 isActive={pathname === link.href}
                 tooltip={link.label}
+                className={
+                  pathname === link.href
+                    ? 'bg-gradient-to-r from-[#667eea] to-[#764ba2] text-white shadow-md scale-[1.04]'
+                    : 'hover:bg-[#e0e7ff] hover:text-[#667eea] transition-all'
+                }
               >
-                <Link href={link.href}>
+                <Link href={link.href} className="flex items-center gap-2 px-2 py-2">
                   <link.icon className="h-5 w-5" />
-                  <span>{link.label}</span>
+                  <span className="font-medium text-base">{link.label}</span>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
