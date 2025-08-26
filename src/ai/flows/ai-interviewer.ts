@@ -1,81 +1,41 @@
-'use server';
 
-/**
- * @fileOverview Implements the AI Interviewer flow for generating adaptive interview questions and analyzing user responses.
- *
- * - `aiInterviewer`: The main function to start the interview process.
- * - `AIInterviewerInput`: The input type for the `aiInterviewer` function.
- * - `AIInterviewerOutput`: The return type for the `aiInterviewer` function.
- */
+import { gemini } from "@/ai/gemini";
 
-import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
+export type AIInterviewerInput = {
+  userResponse: string;
+  currentQuestion: string;
+  topic: string;
+  difficulty: string;
+  history: { question: string; answer: string }[];
+};
 
-const AIInterviewerInputSchema = z.object({
-  userResponse: z
-    .string()
-    .describe('The user response to the current interview question.'),
-  currentQuestion: z.string().describe('The current interview question.'),
-  topic: z
-    .string()
-    .describe('The topic of the interview (e.g., "React Hooks", "Javascript Promises").'),
-  difficulty: z
-    .string()
-    .describe('The difficulty of the interview (e.g., "Beginner", "Medium", "Pro").'),
-  history: z
-    .array(z.object({
-      question: z.string(),
-      answer: z.string(),
-    }))
-    .describe('All previous Q&A pairs in the interview, in order.'),
-});
-export type AIInterviewerInput = z.infer<typeof AIInterviewerInputSchema>;
-
-const AIInterviewerOutputSchema = z.object({
-  nextQuestion: z.string().describe('The next interview question to ask the user.'),
-  feedback: z.string().describe('Feedback on the user response.'),
-});
-export type AIInterviewerOutput = z.infer<typeof AIInterviewerOutputSchema>;
+export type AIInterviewerOutput = {
+  nextQuestion: string;
+  feedback: string;
+};
 
 export async function aiInterviewer(input: AIInterviewerInput): Promise<AIInterviewerOutput> {
-  return aiInterviewerFlow(input);
-}
+  // Compose the prompt for Gemini
+  const historyText = input.history.map((qa, i) => `Q${i + 1}: ${qa.question}\nA${i + 1}: ${qa.answer}`).join("\n");
+  const prompt = `You are an AI interviewer. Your goal is to conduct a realistic mock interview.\n\nThis interview is about the following topic: ${input.topic}.\nThe difficulty level for this interview is: ${input.difficulty}.\n\nYou must adhere to this topic and difficulty for all questions and feedback.\n\nHere is the full history of the interview so far (do not repeat any of these questions):\n${historyText}\n\nThe last question you asked: ${input.currentQuestion}\nThe user's response: ${input.userResponse}\n\nYour tasks are:\n1. Generate a relevant follow-up question that has NOT been asked before in this interview. The question must be directly related to the topic and at the specified difficulty. If the user has not provided a response yet, generate the first question based on the topic and difficulty.\n2. Provide brief, constructive feedback on the user's previous answer.\n\nDo NOT repeat any previous questions. Respond in JSON with keys 'nextQuestion' and 'feedback'.`;
 
-const prompt = ai.definePrompt({
-  name: 'aiInterviewerPrompt',
-  input: {schema: AIInterviewerInputSchema},
-  output: {schema: AIInterviewerOutputSchema},
-  prompt: `You are an AI interviewer. Your goal is to conduct a realistic mock interview.
-
-This interview is about the following topic: **{{{topic}}}**.
-The difficulty level for this interview is: **{{{difficulty}}}**.
-
-You must adhere to this topic and difficulty for all questions and feedback.
-
-Here is the full history of the interview so far (do not repeat any of these questions):
-{{#each history}}
-- Q: {{question}}
-  A: {{answer}}
-{{/each}}
-
-The last question you asked: {{{currentQuestion}}}
-The user's response: {{{userResponse}}}
-
-Your tasks are:
-1. Generate a relevant follow-up question that has NOT been asked before in this interview. The question must be directly related to the topic of **{{{topic}}}** and at the **{{{difficulty}}}** level. If the user has not provided a response yet, generate the first question based on the topic and difficulty.
-2. Provide brief, constructive feedback on the user's previous answer.
-
-Do NOT repeat any previous questions. Please provide your response in the format defined by the output schema.`,
-});
-
-const aiInterviewerFlow = ai.defineFlow(
-  {
-    name: 'aiInterviewerFlow',
-    inputSchema: AIInterviewerInputSchema,
-    outputSchema: AIInterviewerOutputSchema,
-  },
-  async input => {
-    const {output} = await prompt(input);
-    return output!;
+  const model = gemini.getGenerativeModel({ model: "gemini-1.5-flash" });
+  const result = await model.generateContent(prompt);
+  const text = result.response.text();
+  // Try to parse the JSON from the model's response
+  try {
+    const json = JSON.parse(text);
+    return {
+      nextQuestion: json.nextQuestion,
+      feedback: json.feedback,
+    };
+  } catch (e) {
+    // fallback: try to extract with regex
+    const matchQ = text.match(/"nextQuestion"\s*:\s*"([^"]+)"/);
+    const matchF = text.match(/"feedback"\s*:\s*"([^"]+)"/);
+    return {
+      nextQuestion: matchQ ? matchQ[1] : "(Could not parse next question)",
+      feedback: matchF ? matchF[1] : "(Could not parse feedback)",
+    };
   }
-);
+}
