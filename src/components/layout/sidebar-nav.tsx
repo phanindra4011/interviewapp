@@ -23,13 +23,11 @@ export function SidebarNav() {
   const pathname = usePathname();
 
   return (
-    <Sidebar className="border-r no-print bg-gradient-to-b from-[#f0f4ff] to-[#e0e0f8]" collapsible="icon">
+    <Sidebar className="border-r no-print bg-[#0a0b10] text-white" collapsible="icon">
       <SidebarHeader>
         <div className="flex items-center gap-2 p-2">
-          <LogoIcon className="size-8 text-sidebar-primary" />
-          <span className="text-lg font-semibold text-sidebar-foreground">
-            AceInterview
-          </span>
+          <LogoIcon className="size-8 text-white" />
+          <span className="text-lg font-semibold">AceInterview</span>
         </div>
       </SidebarHeader>
       <SidebarContent>
@@ -42,8 +40,8 @@ export function SidebarNav() {
                 tooltip={link.label}
                 className={
                   pathname === link.href
-                    ? 'bg-gradient-to-r from-[#667eea] to-[#764ba2] text-white shadow-md scale-[1.04]'
-                    : 'hover:bg-[#e0e7ff] hover:text-[#667eea] transition-all'
+                    ? 'bg-[#6d3cf6] text-white shadow-md scale-[1.02]'
+                    : 'hover:bg-[#151824] hover:text-white transition-all'
                 }
               >
                 <Link href={link.href} className="flex items-center gap-2 px-2 py-2">

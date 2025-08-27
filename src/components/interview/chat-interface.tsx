@@ -97,6 +97,55 @@ export default function ChatInterface({ interviewId }: { interviewId: string }) 
     }
   };
 
+  const handleSkipQuestion = async () => {
+    if (isSending || interview.isFinished) return;
+    setIsSending(true);
+    const userMessage = {
+      id: `msg_${Date.now()}`,
+      role: 'user' as const,
+      content: 'skip this',
+    };
+    const updatedMessages = [...interview.messages, userMessage];
+    updateInterview(interviewId, { messages: updatedMessages });
+    try {
+      const lastAssistantMessage = interview.messages.filter((m) => m.role === 'assistant').pop();
+      if (!lastAssistantMessage) throw new Error('Could not find the last question from the assistant.');
+      const qaHistory = [] as { question: string; answer: string }[];
+      for (let i = 0; i < interview.messages.length - 1; i++) {
+        if (interview.messages[i].role === 'assistant' && interview.messages[i + 1].role === 'user') {
+          qaHistory.push({
+            question: interview.messages[i].content,
+            answer: interview.messages[i + 1].content,
+          });
+        }
+      }
+      const response = await getNextQuestion({
+        topic: interview.settings.topic,
+        difficulty: interview.settings.difficulty,
+        currentQuestion: lastAssistantMessage.content,
+        userResponse: userMessage.content,
+        history: qaHistory,
+      });
+      const assistantMessage = {
+        id: `msg_${Date.now() + 1}`,
+        role: 'assistant' as const,
+        content: response.nextQuestion,
+        feedbackOnAnswer: response.feedback,
+      };
+      updateInterview(interviewId, { messages: [...updatedMessages, assistantMessage] });
+    } catch (error) {
+      console.error('Failed to skip question:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'Could not skip the question. Please try again.',
+      });
+      updateInterview(interviewId, { messages: interview.messages });
+    } finally {
+      setIsSending(false);
+    }
+  };
+
   const handleFinishInterview = () => {
     updateInterview(interviewId, { isFinished: true });
     router.push(`/report/${interviewId}`);
@@ -168,6 +217,14 @@ export default function ChatInterface({ interviewId }: { interviewId: string }) 
               ) : (
                 <Send className="h-5 w-5" />
               )}
+            </Button>
+            <Button
+              variant="outline"
+              className="absolute bottom-2 right-16"
+              onClick={handleSkipQuestion}
+              disabled={isSending}
+            >
+              Skip Question
             </Button>
           </div>
         )}
